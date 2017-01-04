@@ -7,3 +7,6 @@
 [submodule "storer"]
 	path = storer
 	url = https://github.com/cyber-dojo/storer.git
+[submodule "collector"]
+	path = collector
+	url = https://github.com/cyber-dojo/collector.git
