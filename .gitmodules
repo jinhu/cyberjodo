@@ -4,3 +4,6 @@
 [submodule "runner"]
 	path = runner
 	url = https://github.com/cyber-dojo/runner.git
+[submodule "storer"]
+	path = storer
+	url = https://github.com/cyber-dojo/storer.git
