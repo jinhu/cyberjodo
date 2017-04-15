@@ -25,3 +25,6 @@
 [submodule "runner_stateless"]
 	path = runner_stateless
 	url = https://github.com/cyber-dojo/runner_stateless.git
+[submodule "nginx"]
+	path = nginx
+	url = https://github.com/cyber-dojo/nginx.git
