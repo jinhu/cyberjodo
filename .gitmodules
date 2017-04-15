@@ -22,3 +22,6 @@
 [submodule "system-tests"]
 	path = system-tests
 	url = https://github.com/cyber-dojo/system-tests.git
+[submodule "runner_stateless"]
+	path = runner_stateless
+	url = https://github.com/cyber-dojo/runner_stateless.git
