@@ -31,3 +31,6 @@
 [submodule "terraform"]
 	path = terraform
 	url = https://github.com/cyber-dojo/terraform-aws.git
+[submodule "zipper"]
+	path = zipper
+	url = https://github.com/cyber-dojo/zipper.git
