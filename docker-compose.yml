@@ -1,0 +1,182 @@
+
+version: '2.2'
+
+services:
+  # - - - - - - - - - - - - - - - -
+  cpp_workshop:
+    image: registry.incubat.org/academy/cpp_workshop
+  # - - - - - - - - - - - - - - - -
+  languages:
+    image: registry.incubat.org/academy/languages
+  # - - - - - - - - - - - - - - - -
+  exercises:
+    image: registry.incubat.org/academy/exercises
+  # - - - - - - - - - - - - - - - -
+  nginx:
+    image: registry.incubat.org/iot/infra/nginx
+    depends_on:
+      - web
+    ports:
+      - 80:80
+    volumes:
+      - ./images:/usr/share/nginx/html/images
+      - ./nginx.conf:/etc/nginx/nginx.conf
+
+
+  # - - - - - - - - - - - - - - - -
+
+  web:
+    container_name: dojo-engine
+    user: nobody
+    image: registry.incubat.org/academy/dojo_engine
+    init: true
+    mem_limit: 2G
+    memswap_limit: 2G
+    restart: 'no'
+    environment:
+      - CYBER_DOJO_HOME
+    depends_on:
+      - differ
+      - runner_stateless
+      - runner_stateful
+      - runner_processful
+      - starter
+      - storer
+      - zipper
+#    ports:
+#      - 3000:3000
+
+  # - - - - - - - - - - - - - - - -
+
+  starter:
+    container_name: dojo-starter
+    user: nobody
+    image: cyberdojo/starter
+    init: true
+    read_only: true
+    tmpfs: /tmp
+    mem_limit: 50M
+    memswap_limit: 50M
+    restart: 'no'
+    environment:
+      - CYBER_DOJO_START_POINTS_ROOT
+#    volumes:
+#      - ./data/start_points:${CYBER_DOJO_START_POINTS_ROOT}:ro
+#      - ../cpp_workshops/data:${CYBER_DOJO_START_POINTS_ROOT}/custom/cpp:ro
+    volumes_from:
+      - cpp_workshop
+      - languages
+      - exercises
+  # - - - - - - - - - - - - - - - -
+
+  storer:
+    user: storer
+    image: cyberdojo/storer
+    init: true
+    container_name: dojo-storer
+    read_only: true
+    tmpfs: /tmp
+    mem_limit: 2G
+    memswap_limit: 2G
+    restart: 'no'
+    environment:
+      - CYBER_DOJO_KATAS_ROOT
+    depends_on:
+      - starter
+
+  # - - - - - - - - - - - - - - - -
+
+  runner_stateless:
+    user: root
+    image: cyberdojo/runner_stateless
+    init: true
+    container_name: dojo-runner-stateless
+    read_only: true
+    tmpfs: /tmp
+    mem_limit: 2G
+    memswap_limit: 2G
+    restart: 'no'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  # - - - - - - - - - - - - - - - -
+
+  runner_stateful:
+    user: root
+    image: cyberdojo/runner_stateful
+    init: true
+    container_name: dojo-runner-stateful
+    read_only: true
+    tmpfs: /tmp
+    mem_limit: 2G
+    memswap_limit: 2G
+    restart: 'no'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  # - - - - - - - - - - - - - - - -
+
+  runner_processful:
+    user: root
+    image: cyberdojo/runner_processful
+    init: true
+    container_name: dojo-runner-processful
+    read_only: true
+    tmpfs: /tmp
+    mem_limit: 2G
+    memswap_limit: 2G
+    restart: 'no'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  # - - - - - - - - - - - - - - - -
+
+  differ:
+    user: nobody
+    image: cyberdojo/differ
+    init: true
+    container_name: dojo-differ
+    read_only: true
+    tmpfs: /tmp
+    mem_limit: 1G
+    memswap_limit: 1G
+    restart: 'no'
+
+  # - - - - - - - - - - - - - - - -
+
+  zipper:
+    user: nobody
+    image: cyberdojo/zipper
+    init: true
+    container_name: dojo-zipper
+    read_only: true
+    tmpfs: /tmp
+    mem_limit: 50M
+    memswap_limit: 50M
+    restart: 'no'
+    depends_on:
+      - storer
+
+  # - - - - - - - - - - - - - - - -
+
+  collector:
+    image: cyberdojo/collector
+    container_name: dojo-collector
+    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
+
+  # - - - - - - - - - - - - - - - -
+
+  prometheus:
+    image: registry.incubat.org/iot/infra/prometheus
+    command: '--config.file=/etc/prometheus/prometheus.yml'
+    container_name: dojo-prometheus
+    ports:
+        - '9090:9090'
+  # - - - - - - - - - - - - - - - -
+
+  grafana:
+    image: registry.incubat.org/iot/infra/grafana
+    container_name: dojo-grafana
+    ports:
+        - '3000:3000'
+# - - - - - - - - - - - - - - - -
